@@ -22,8 +22,8 @@ from absl import flags
 
 import tensorflow as tf
 
-from object_detection import model_hparams
-from object_detection import model_lib
+from lib import model_hparams
+from lib import model_lib
 
 flags.DEFINE_string(
     'model_dir', None, 'Path to output model directory '
@@ -58,7 +58,7 @@ FLAGS = flags.FLAGS
 
 def main(unused_argv):
   gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
-  sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) 
+  sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
   flags.mark_flag_as_required('model_dir')
   flags.mark_flag_as_required('pipeline_config_path')
   config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir)
