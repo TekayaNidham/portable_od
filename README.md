@@ -1,4 +1,4 @@
-# Plug n Play Tensorflow Object Detection API
+# Clone n Play Tensorflow Object Detection API
 
 
 [![TensorFlow 1.15](https://img.shields.io/badge/TensorFlow-1.15-FF6F00?logo=tensorflow)](https://github.com/tensorflow/tensorflow/releases/tag/v1.15.0)
