@@ -57,55 +57,55 @@ FLAGS = flags.FLAGS
 
 
 def main(unused_argv):
-  gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
-  sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-  flags.mark_flag_as_required('model_dir')
-  flags.mark_flag_as_required('pipeline_config_path')
-  config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
+    sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+    flags.mark_flag_as_required('model_dir')
+    flags.mark_flag_as_required('pipeline_config_path')
+    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir)
 
-  train_and_eval_dict = model_lib.create_estimator_and_inputs(
-      run_config=config,
-      hparams=model_hparams.create_hparams(FLAGS.hparams_overrides),
-      pipeline_config_path=FLAGS.pipeline_config_path,
-      train_steps=FLAGS.num_train_steps,
-      sample_1_of_n_eval_examples=FLAGS.sample_1_of_n_eval_examples,
-      sample_1_of_n_eval_on_train_examples=(
-          FLAGS.sample_1_of_n_eval_on_train_examples))
-  estimator = train_and_eval_dict['estimator']
-  train_input_fn = train_and_eval_dict['train_input_fn']
-  eval_input_fns = train_and_eval_dict['eval_input_fns']
-  eval_on_train_input_fn = train_and_eval_dict['eval_on_train_input_fn']
-  predict_input_fn = train_and_eval_dict['predict_input_fn']
-  train_steps = train_and_eval_dict['train_steps']
+    train_and_eval_dict = model_lib.create_estimator_and_inputs(
+        run_config=config,
+        hparams=model_hparams.create_hparams(FLAGS.hparams_overrides),
+        pipeline_config_path=FLAGS.pipeline_config_path,
+        train_steps=FLAGS.num_train_steps,
+        sample_1_of_n_eval_examples=FLAGS.sample_1_of_n_eval_examples,
+        sample_1_of_n_eval_on_train_examples=(
+            FLAGS.sample_1_of_n_eval_on_train_examples))
+    estimator = train_and_eval_dict['estimator']
+    train_input_fn = train_and_eval_dict['train_input_fn']
+    eval_input_fns = train_and_eval_dict['eval_input_fns']
+    eval_on_train_input_fn = train_and_eval_dict['eval_on_train_input_fn']
+    predict_input_fn = train_and_eval_dict['predict_input_fn']
+    train_steps = train_and_eval_dict['train_steps']
 
-  if FLAGS.checkpoint_dir:
-    if FLAGS.eval_training_data:
-      name = 'training_data'
-      input_fn = eval_on_train_input_fn
+    if FLAGS.checkpoint_dir:
+        if FLAGS.eval_training_data:
+            name = 'training_data'
+            input_fn = eval_on_train_input_fn
+        else:
+            name = 'validation_data'
+            # The first eval input will be evaluated.
+            input_fn = eval_input_fns[0]
+        if FLAGS.run_once:
+            estimator.evaluate(input_fn,
+                               steps=None,
+                               checkpoint_path=tf.train.latest_checkpoint(
+                                   FLAGS.checkpoint_dir))
+        else:
+            model_lib.continuous_eval(estimator, FLAGS.checkpoint_dir, input_fn,
+                                      train_steps, name)
     else:
-      name = 'validation_data'
-      # The first eval input will be evaluated.
-      input_fn = eval_input_fns[0]
-    if FLAGS.run_once:
-      estimator.evaluate(input_fn,
-                         steps=None,
-                         checkpoint_path=tf.train.latest_checkpoint(
-                             FLAGS.checkpoint_dir))
-    else:
-      model_lib.continuous_eval(estimator, FLAGS.checkpoint_dir, input_fn,
-                                train_steps, name)
-  else:
-    train_spec, eval_specs = model_lib.create_train_and_eval_specs(
-        train_input_fn,
-        eval_input_fns,
-        eval_on_train_input_fn,
-        predict_input_fn,
-        train_steps,
-        eval_on_train_data=False)
+        train_spec, eval_specs = model_lib.create_train_and_eval_specs(
+            train_input_fn,
+            eval_input_fns,
+            eval_on_train_input_fn,
+            predict_input_fn,
+            train_steps,
+            eval_on_train_data=False)
 
-    # Currently only a single Eval Spec is allowed.
-    tf.estimator.train_and_evaluate(estimator, train_spec, eval_specs[0])
+        # Currently only a single Eval Spec is allowed.
+        tf.estimator.train_and_evaluate(estimator, train_spec, eval_specs[0])
 
 
 if __name__ == '__main__':
-  tf.app.run()
+    tf.app.run()
