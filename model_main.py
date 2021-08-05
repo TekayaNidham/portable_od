@@ -29,7 +29,8 @@ flags.DEFINE_string(
     "Path to output model directory "
     "where event and checkpoint files will be written.",
 )
-flags.DEFINE_string("pipeline_config_path", None, "Path to pipeline config " "file.")
+flags.DEFINE_string("pipeline_config_path", None, "Path to pipeline config "
+                    "file.")
 flags.DEFINE_integer("num_train_steps", None, "Number of train steps.")
 flags.DEFINE_boolean(
     "eval_training_data",
@@ -41,7 +42,8 @@ flags.DEFINE_boolean(
 flags.DEFINE_integer(
     "sample_1_of_n_eval_examples",
     1,
-    "Will sample one of " "every n eval input examples, where n is provided.",
+    "Will sample one of "
+    "every n eval input examples, where n is provided.",
 )
 flags.DEFINE_integer(
     "sample_1_of_n_eval_on_train_examples",
@@ -88,8 +90,7 @@ def main(unused_argv):
         train_steps=FLAGS.num_train_steps,
         sample_1_of_n_eval_examples=FLAGS.sample_1_of_n_eval_examples,
         sample_1_of_n_eval_on_train_examples=(
-            FLAGS.sample_1_of_n_eval_on_train_examples
-        ),
+            FLAGS.sample_1_of_n_eval_on_train_examples),
     )
     estimator = train_and_eval_dict["estimator"]
     train_input_fn = train_and_eval_dict["train_input_fn"]
@@ -110,12 +111,12 @@ def main(unused_argv):
             estimator.evaluate(
                 input_fn,
                 steps=None,
-                checkpoint_path=tf.train.latest_checkpoint(FLAGS.checkpoint_dir),
+                checkpoint_path=tf.train.latest_checkpoint(
+                    FLAGS.checkpoint_dir),
             )
         else:
-            model_lib.continuous_eval(
-                estimator, FLAGS.checkpoint_dir, input_fn, train_steps, name
-            )
+            model_lib.continuous_eval(estimator, FLAGS.checkpoint_dir,
+                                      input_fn, train_steps, name)
     else:
         train_spec, eval_specs = model_lib.create_train_and_eval_specs(
             train_input_fn,
