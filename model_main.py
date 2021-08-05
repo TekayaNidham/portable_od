@@ -57,7 +57,7 @@ FLAGS = flags.FLAGS
 
 
 def main(unused_argv):
-  gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
+  gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.6)
   sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
   flags.mark_flag_as_required('model_dir')
   flags.mark_flag_as_required('pipeline_config_path')
