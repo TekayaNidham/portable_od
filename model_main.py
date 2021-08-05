@@ -13,13 +13,15 @@
 # limitations under the License.
 # ==============================================================================
 """Binary to run train and evaluation on object detection model."""
-
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import tensorflow as tf
 from absl import flags
 
-from lib import model_hparams, model_lib
+from lib import model_hparams
+from lib import model_lib
 
 flags.DEFINE_string(
     "model_dir",
